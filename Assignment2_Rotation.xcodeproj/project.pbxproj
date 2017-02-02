@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E875D85C1E4227A300FCBBA6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E875D85B1E4227A300FCBBA6 /* OpenGL.framework */; };
+		E875D85E1E4227B300FCBBA6 /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E875D85D1E4227B300FCBBA6 /* libglfw.3.2.dylib */; };
+		E875D8601E4227C500FCBBA6 /* libGLEW.2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E875D85F1E4227C500FCBBA6 /* libGLEW.2.0.0.dylib */; };
+		E875D8621E4227D000FCBBA6 /* libassimp.3.3.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E875D8611E4227D000FCBBA6 /* libassimp.3.3.1.dylib */; };
+		E875D8641E4227E100FCBBA6 /* libSOIL.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E875D8631E4227E100FCBBA6 /* libSOIL.dylib */; };
 		E87826251E40ADE4004567C7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E87826241E40ADE4004567C7 /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +28,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E875D8561E42279900FCBBA6 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		E875D8571E42279900FCBBA6 /* Mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
+		E875D8581E42279900FCBBA6 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		E875D8591E42279900FCBBA6 /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
+		E875D85B1E4227A300FCBBA6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		E875D85D1E4227B300FCBBA6 /* libglfw.3.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.2.dylib; path = ../../../../../usr/local/Cellar/glfw/3.2.1/lib/libglfw.3.2.dylib; sourceTree = "<group>"; };
+		E875D85F1E4227C500FCBBA6 /* libGLEW.2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.0.0.dylib; path = ../../../../../usr/local/Cellar/glew/2.0.0/lib/libGLEW.2.0.0.dylib; sourceTree = "<group>"; };
+		E875D8611E4227D000FCBBA6 /* libassimp.3.3.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.3.3.1.dylib; path = ../../../../../usr/local/Cellar/assimp/3.3.1/lib/libassimp.3.3.1.dylib; sourceTree = "<group>"; };
+		E875D8631E4227E100FCBBA6 /* libSOIL.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSOIL.dylib; path = ../../../../../usr/local/lib/libSOIL.dylib; sourceTree = "<group>"; };
+		E875D8671E42288900FCBBA6 /* diffuse.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = diffuse.frag; path = Build/Products/Debug/diffuse.frag; sourceTree = "<group>"; };
+		E875D8681E42288900FCBBA6 /* diffuse.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = diffuse.vs; path = Build/Products/Debug/diffuse.vs; sourceTree = "<group>"; };
 		E87826211E40ADE4004567C7 /* Assignment2_Rotation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Assignment2_Rotation; sourceTree = BUILT_PRODUCTS_DIR; };
 		E87826241E40ADE4004567C7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -32,17 +48,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E875D8641E4227E100FCBBA6 /* libSOIL.dylib in Frameworks */,
+				E875D8621E4227D000FCBBA6 /* libassimp.3.3.1.dylib in Frameworks */,
+				E875D8601E4227C500FCBBA6 /* libGLEW.2.0.0.dylib in Frameworks */,
+				E875D85E1E4227B300FCBBA6 /* libglfw.3.2.dylib in Frameworks */,
+				E875D85C1E4227A300FCBBA6 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E875D85A1E4227A300FCBBA6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E875D8631E4227E100FCBBA6 /* libSOIL.dylib */,
+				E875D8611E4227D000FCBBA6 /* libassimp.3.3.1.dylib */,
+				E875D85F1E4227C500FCBBA6 /* libGLEW.2.0.0.dylib */,
+				E875D85D1E4227B300FCBBA6 /* libglfw.3.2.dylib */,
+				E875D85B1E4227A300FCBBA6 /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E87826181E40ADE4004567C7 = {
 			isa = PBXGroup;
 			children = (
 				E87826231E40ADE4004567C7 /* Assignment2_Rotation */,
 				E87826221E40ADE4004567C7 /* Products */,
+				E875D8671E42288900FCBBA6 /* diffuse.frag */,
+				E875D8681E42288900FCBBA6 /* diffuse.vs */,
+				E875D85A1E4227A300FCBBA6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,6 +93,10 @@
 		E87826231E40ADE4004567C7 /* Assignment2_Rotation */ = {
 			isa = PBXGroup;
 			children = (
+				E875D8561E42279900FCBBA6 /* Camera.h */,
+				E875D8571E42279900FCBBA6 /* Mesh.h */,
+				E875D8581E42279900FCBBA6 /* Model.h */,
+				E875D8591E42279900FCBBA6 /* Shader.h */,
 				E87826241E40ADE4004567C7 /* main.cpp */,
 			);
 			path = Assignment2_Rotation;
@@ -166,6 +206,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/Cellar/glfw/3.2.1/lib,
+					/usr/local/Cellar/glew/2.0.0/lib,
+					/usr/local/Cellar/assimp/3.3.1/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -207,6 +254,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/Cellar/glfw/3.2.1/lib,
+					/usr/local/Cellar/glew/2.0.0/lib,
+					/usr/local/Cellar/assimp/3.3.1/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -216,6 +270,13 @@
 		E87826291E40ADE4004567C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/Cellar/glfw/3.2.1/lib,
+					/usr/local/Cellar/glew/2.0.0/lib,
+					/usr/local/Cellar/assimp/3.3.1/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -223,6 +284,13 @@
 		E878262A1E40ADE4004567C7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/Cellar/glfw/3.2.1/lib,
+					/usr/local/Cellar/glew/2.0.0/lib,
+					/usr/local/Cellar/assimp/3.3.1/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -246,6 +314,7 @@
 				E878262A1E40ADE4004567C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
