@@ -34,7 +34,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void do_movement();
 glm::mat4 toEuler(GLfloat yaw, GLfloat pitch, GLfloat roll);
-glm::mat4 toQuaternion(GLfloat x, GLfloat y, GLfloat z, GLfloat angle);
+glm::mat4 toQuaternion(GLfloat x, GLfloat y, GLfloat z);
 
 // Camera
 Camera  camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -53,7 +53,11 @@ GLfloat Yaw, Pitch, Roll = 0.0f;
 GLfloat deltaRot = glm::radians(0.5);
 
 glm::quat quaternion;
-GLfloat x, y, z, angle = 0.0f;
+GLfloat x, y, z;
+GLfloat detlaAngle = glm::radians(20.0f);
+glm::mat4 modelMatrix;
+
+bool firstPerson = true;
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -116,21 +120,23 @@ int main()
         
         glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
 
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 view;
+        if(firstPerson)
+            view = camera.GetViewMatrix();
+        
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 model;
         if(euler)
-            model = toEuler(Yaw, Pitch, Roll);
+            modelMatrix = toEuler(Yaw, Pitch, Roll);
         else{
-            model = toQuaternion(x, y, z, angle);
-            Yaw = Pitch = Roll = 0.0f;
+            glm::mat4 model;
+            model = toQuaternion(x, y, z);
+            x = y = z = 0.0f;
+            modelMatrix *= model;
         }
-        
-        
-//        cout<<glm::to_string(q)<<endl;
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+      
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         plane.Draw(shader);
         
         glfwSwapBuffers(window);
@@ -163,111 +169,117 @@ void do_movement()
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (keys[GLFW_KEY_D])
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if(!euler){
-        if (keys[GLFW_KEY_Y]){
-            angle += 2;
-            if(angle == 360.0f)
-                angle = 0.0f;
-                
-        }
-        if (keys[GLFW_KEY_H]){
-            angle -= 2;
-            if(angle == -360.0f)
-                angle = 0.0f;
-        }
-    }
     if (keys[GLFW_KEY_U]){
         if(euler)
             Yaw += deltaRot;
         else
-            x += deltaRot;
+            x += detlaAngle;
     }
     if (keys[GLFW_KEY_J]){
         if(euler)
             Yaw -= deltaRot;
         else
-            x -= deltaRot;
+            x -= detlaAngle;
 
     }
     if (keys[GLFW_KEY_I]){
         if(euler)
             Pitch += deltaRot;
         else
-            y += deltaRot;
+            y += detlaAngle;
     }
     if (keys[GLFW_KEY_K]){
         if(euler)
             Pitch -= deltaRot;
         else
-            y -= deltaRot;
+            y -= detlaAngle;
     }
     if (keys[GLFW_KEY_O]){
         if(euler)
             Roll += deltaRot;
         else
-            z += deltaRot;
+            z += detlaAngle;
     }
     if (keys[GLFW_KEY_L]){
         if(euler)
             Roll -= deltaRot;
         else
-            z -= deltaRot;
+            z -= detlaAngle;
     }
     if(keys[GLFW_KEY_1]){
         Yaw = Pitch = Roll = 0.0f;
         euler = true;
     }
     if(keys[GLFW_KEY_2]){
-        x = 0; y = 0; z = 0; angle = 40.0f;
+        x = 0; y = 0; z = 0;
         euler = false;
+    }
+    if(keys[GLFW_KEY_3]){
+        camera.changeView();
     }
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    if (firstMouse) {
+    if(firstPerson){
+        if (firstMouse) {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+        
+        GLfloat xoffset = xpos - lastX;
+        GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
+        
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+        
+        camera.ProcessMouseMovement(xoffset, yoffset);
     }
-    
-    GLfloat xoffset = xpos - lastX;
-    GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
-    
-    lastX = xpos;
-    lastY = ypos;
-    
-    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 glm::mat4 toEuler(GLfloat yaw, GLfloat pitch, GLfloat roll){
     glm::mat4 m;
-    m[0][0] = glm::cos(Yaw)*glm::cos(Pitch);
-    m[0][1] = glm::cos(Pitch)*glm::sin(Yaw);
-    m[0][2] = -1*glm::sin(Pitch);
-    m[1][0] = glm::cos(Yaw)*glm::sin(Roll)*glm::sin(Pitch) - glm::cos(Roll)*glm::sin(Yaw);
-    m[1][1] = glm::cos(Roll)*glm::cos(Yaw) + glm::sin(Roll)*glm::sin(Yaw)*glm::sin(Pitch);
-    m[1][2] = glm::cos(Pitch)*glm::sin(Roll);
-    m[2][0] = glm::sin(Roll)*glm::sin(Yaw) + glm::cos(Roll)*glm::cos(Yaw)*glm::sin(Pitch);
-    m[2][1] = glm::cos(Roll)*glm::sin(Yaw)*glm::sin(Pitch) - glm::cos(Yaw)*glm::sin(Roll);
-    m[2][2] = glm::cos(Roll)*glm::cos(Pitch);
+    m[0][0] = glm::cos(yaw)*glm::cos(pitch);
+    m[0][1] = glm::cos(pitch)*glm::sin(yaw);
+    m[0][2] = -1*glm::sin(pitch);
+    m[1][0] = glm::cos(yaw)*glm::sin(roll)*glm::sin(pitch) - glm::cos(roll)*glm::sin(yaw);
+    m[1][1] = glm::cos(roll)*glm::cos(yaw) + glm::sin(roll)*glm::sin(yaw)*glm::sin(pitch);
+    m[1][2] = glm::cos(pitch)*glm::sin(roll);
+    m[2][0] = glm::sin(roll)*glm::sin(yaw) + glm::cos(roll)*glm::cos(yaw)*glm::sin(pitch);
+    m[2][1] = glm::cos(roll)*glm::sin(yaw)*glm::sin(pitch) - glm::cos(yaw)*glm::sin(roll);
+    m[2][2] = glm::cos(roll)*glm::cos(pitch);
     
     return m;
 }
 
-glm::mat4 toQuaternion(GLfloat x, GLfloat y, GLfloat z, GLfloat angle){
-    glm::quat q;
-    q.x = x * glm::sin(glm::radians(angle/2));
-    q.y = y * glm::sin(glm::radians(angle/2));
-    q.z = z * glm::sin(glm::radians(angle/2));
-    q.w = glm::cos(glm::radians(angle/2));
+glm::mat4 toQuaternion(GLfloat x, GLfloat y, GLfloat z){
+    glm::quat p, q, r, s;
+    p.x = 1 * glm::sin(glm::radians(x/2));
+    p.y = 0 * glm::sin(glm::radians(x/2));
+    p.z = 0 * glm::sin(glm::radians(x/2));
+    p.w = glm::cos(glm::radians(x/2));
     
-    GLfloat norm = sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
-    q.x =  q.x / norm;
-    q.y =  q.y / norm;
-    q.z =  q.z / norm;
-    q.w =  q.w / norm;
+    q.x = 0 * glm::sin(glm::radians(y/2));
+    q.y = 1 * glm::sin(glm::radians(y/2));
+    q.z = 0 * glm::sin(glm::radians(y/2));
+    q.w = glm::cos(glm::radians(y/2));
+    
+    s = glm::cross(p, q);
+    
+    r.x = 0 * glm::sin(glm::radians(z/2));
+    r.y = 0 * glm::sin(glm::radians(z/2));
+    r.z = 1 * glm::sin(glm::radians(z/2));
+    r.w = glm::cos(glm::radians(z/2));
 
-    glm::mat4 m = glm::mat4_cast(q);
+    s = glm::cross(s, r);
+    
+    GLfloat norm = sqrt(s.x*s.x + s.y*s.y + s.z*s.z + s.w*s.w);
+    s.x =  s.x / norm;
+    s.y =  s.y / norm;
+    s.z =  s.z / norm;
+    s.w =  s.w / norm;
+    
+    glm::mat4 m = glm::mat4_cast(s);
     return m;
 }

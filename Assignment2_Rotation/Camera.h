@@ -22,7 +22,7 @@ enum Camera_Movement {
 const GLfloat YAW        = -90.0f;
 const GLfloat PITCH      =  0.0f;
 const GLfloat SPEED      =  3.0f;
-const GLfloat SENSITIVTY =  0.25f;
+const GLfloat SENSITIVTY =  0.15f;
 const GLfloat ZOOM       =  45.0f;
 
 
@@ -130,6 +130,13 @@ public:
     {
         return this->Front;
     }
+    
+    void changeView(){
+        this->Yaw = 90;
+        this->Position = glm::vec3(0, 1, -3);
+        updateCameraVectors();
+    }
+    
 private:
     // Calculates the front vector from the Camera's (updated) Eular Angles
     void updateCameraVectors()
