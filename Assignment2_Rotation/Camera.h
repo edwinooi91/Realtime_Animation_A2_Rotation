@@ -131,10 +131,10 @@ public:
         return this->Front;
     }
     
-    void changeView(){
+    void changeView(glm::vec3 Pos){
         this->Yaw = 90;
-        this->Position = glm::vec3(0, 1, -3);
-        updateCameraVectors();
+        this->Position = Pos;
+        updateCameraVectors(); 
     }
     
 private:

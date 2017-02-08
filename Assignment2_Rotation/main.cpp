@@ -102,6 +102,7 @@ int main()
     
     Shader shader("diffuse.vs", "diffuse.frag");
     Model plane("Heli/heli.obj");
+    Model cat("cat.obj");
     
     // Game loop
     while(!glfwWindowShouldClose(window)) {
@@ -119,13 +120,7 @@ int main()
         shader.Use();
         
         glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
-
-        glm::mat4 view;
-        if(firstPerson)
-            view = camera.GetViewMatrix();
-        
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         
         if(euler)
             modelMatrix = toEuler(Yaw, Pitch, Roll);
@@ -135,8 +130,16 @@ int main()
             x = y = z = 0.0f;
             modelMatrix *= model;
         }
-      
+        
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        
+        glm::mat4 view;
+        if(firstPerson)
+            view = camera.GetViewMatrix();
+        else
+            view = camera.GetViewMatrix() * glm::inverse(modelMatrix);
+        
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         plane.Draw(shader);
         
         glfwSwapBuffers(window);
@@ -215,8 +218,10 @@ void do_movement()
         euler = false;
     }
     if(keys[GLFW_KEY_3]){
-        camera.changeView();
+        firstPerson = false;
+        camera.changeView(glm::vec3(0, 0.25, 0.9));
     }
+    
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
