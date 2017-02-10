@@ -16,7 +16,7 @@ dependencies: \
   /usr/local/include/assimp/matrix3x3.inl \
   /usr/local/include/assimp/matrix4x4.inl \
   /usr/local/include/assimp/importerdesc.h \
-  /usr/local/include/glm/glm.hpp \
+  /usr/local/include/SOIL/SOIL.h /usr/local/include/glm/glm.hpp \
   /usr/local/include/glm/detail/_fixes.hpp \
   /usr/local/include/glm/fwd.hpp \
   /usr/local/include/glm/detail/type_int.hpp \
@@ -129,7 +129,7 @@ dependencies: \
   /Users/Edwin/Desktop/Realtime\ Animation/Realtime_Animation_A2_Rotation/Assignment2_Rotation/Shader.h \
   /Users/Edwin/Desktop/Realtime\ Animation/Realtime_Animation_A2_Rotation/Assignment2_Rotation/Camera.h \
   /Users/Edwin/Desktop/Realtime\ Animation/Realtime_Animation_A2_Rotation/Assignment2_Rotation/Model.h \
-  /usr/local/include/SOIL/SOIL.h /usr/local/include/assimp/Importer.hpp \
+  /usr/local/include/assimp/Importer.hpp \
   /usr/local/include/assimp/config.h /usr/local/include/assimp/scene.h \
   /usr/local/include/assimp/texture.h /usr/local/include/assimp/mesh.h \
   /usr/local/include/assimp/light.h /usr/local/include/assimp/camera.h \

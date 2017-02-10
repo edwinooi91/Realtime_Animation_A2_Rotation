@@ -11,6 +11,9 @@
 // assimp
 #include <assimp/cimport.h>
 
+//SOIL
+#include <SOIL/SOIL.h>
+
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -33,6 +36,8 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void do_movement();
+GLuint loadTexture(GLchar* path, GLboolean alpha = false);
+GLuint loadCubemap(vector<const GLchar*> faces);
 glm::mat4 toEuler(GLfloat yaw, GLfloat pitch, GLfloat roll);
 glm::mat4 toQuaternion(GLfloat x, GLfloat y, GLfloat z);
 
@@ -54,10 +59,10 @@ GLfloat deltaRot = glm::radians(0.5);
 
 glm::quat quaternion;
 GLfloat x, y, z;
-GLfloat detlaAngle = glm::radians(20.0f);
-glm::mat4 modelMatrix;
+GLfloat detlaAngle = glm::radians(40.0f);
+glm::mat4 modelMatrix, viewMatrix;
 
-bool firstPerson = true;
+bool firstPerson = false;
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -100,9 +105,73 @@ int main()
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     glEnable(GL_DEPTH_TEST);
     
+    GLfloat skyboxVertices[] = {
+        // Positions
+        -10.0f,  10.0f, -10.0f,
+        -10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        
+        -10.0f, -10.0f,  10.0f,
+        -10.0f, -10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f,  10.0f,
+        -10.0f, -10.0f,  10.0f,
+        
+        10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        
+        -10.0f, -10.0f,  10.0f,
+        -10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f, -10.0f,  10.0f,
+        -10.0f, -10.0f,  10.0f,
+        
+        -10.0f,  10.0f, -10.0f,
+        10.0f,  10.0f, -10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        -10.0f,  10.0f,  10.0f,
+        -10.0f,  10.0f, -10.0f,
+        
+        -10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f,  10.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f,  10.0f,
+        10.0f, -10.0f,  10.0f
+    };
+    
+    GLuint skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glBindVertexArray(0);
+
+    vector<const GLchar*> faces;
+    faces.push_back("skybox/xpos.jpg");
+    faces.push_back("skybox/xneg.jpg");
+    faces.push_back("skybox/ypos.jpg");
+    faces.push_back("skybox/yneg.jpg");
+    faces.push_back("skybox/zpos.jpg");
+    faces.push_back("skybox/zneg.jpg");
+    GLuint skyboxTexture = loadCubemap(faces);
+    
     Shader shader("diffuse.vs", "diffuse.frag");
+    Shader skyboxShader("skybox.vs", "skybox.frag");
     Model plane("Heli/heli.obj");
-    Model cat("cat.obj");
     
     // Game loop
     while(!glfwWindowShouldClose(window)) {
@@ -134,13 +203,29 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         
         glm::mat4 view;
-        if(firstPerson)
-            view = camera.GetViewMatrix();
+        if(firstPerson){
+            view = glm::translate(modelMatrix, glm::vec3(0, 0.2f, 0.95f));
+            view = glm::rotate(view, glm::radians(180.0f), glm::vec3(0,1,0));
+            view = glm::inverse(view);
+        }
         else
-            view = camera.GetViewMatrix() * glm::inverse(modelMatrix);
+            view = camera.GetViewMatrix();
         
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         plane.Draw(shader);
+        
+        glDepthFunc(GL_LEQUAL);
+        skyboxShader.Use();
+        glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        // skybox cube
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glUniform1i(glGetUniformLocation(shader.Program, "skybox"), 0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS);
         
         glfwSwapBuffers(window);
     }
@@ -176,13 +261,13 @@ void do_movement()
         if(euler)
             Yaw += deltaRot;
         else
-            x += detlaAngle;
+            z += detlaAngle;
     }
     if (keys[GLFW_KEY_J]){
         if(euler)
             Yaw -= deltaRot;
         else
-            x -= detlaAngle;
+            z -= detlaAngle;
 
     }
     if (keys[GLFW_KEY_I]){
@@ -201,46 +286,90 @@ void do_movement()
         if(euler)
             Roll += deltaRot;
         else
-            z += detlaAngle;
+            x += detlaAngle;
     }
     if (keys[GLFW_KEY_L]){
         if(euler)
             Roll -= deltaRot;
         else
-            z -= detlaAngle;
+            x -= detlaAngle;
     }
     if(keys[GLFW_KEY_1]){
         Yaw = Pitch = Roll = 0.0f;
         euler = true;
     }
     if(keys[GLFW_KEY_2]){
-        x = 0; y = 0; z = 0;
+        modelMatrix = glm::mat4();
         euler = false;
     }
     if(keys[GLFW_KEY_3]){
-        firstPerson = false;
-        camera.changeView(glm::vec3(0, 0.25, 0.9));
+        firstPerson = true;
+        euler = false;
     }
-    
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    if(firstPerson){
-        if (firstMouse) {
-            lastX = xpos;
-            lastY = ypos;
-            firstMouse = false;
-        }
-        
-        GLfloat xoffset = xpos - lastX;
-        GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
-        
+    if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
-        
-        camera.ProcessMouseMovement(xoffset, yoffset);
+        firstMouse = false;
     }
+    
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
+    
+    lastX = xpos;
+    lastY = ypos;
+    
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+GLuint loadCubemap(vector<const GLchar*> faces)
+{
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    
+    int width,height;
+    unsigned char* image;
+    
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    for(GLuint i = 0; i < faces.size(); i++)
+    {
+        image = SOIL_load_image(faces[i], &width, &height, 0, SOIL_LOAD_RGB);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+        SOIL_free_image_data(image);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    
+    return textureID;
+}
+
+GLuint loadTexture(GLchar* path)
+{
+    //Generate texture ID and load texture data
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    int width,height;
+    unsigned char* image = SOIL_load_image(path, &width, &height, 0, SOIL_LOAD_RGB);
+    // Assign texture to ID
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
+    // Parameters
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    SOIL_free_image_data(image);
+    return textureID;
 }
 
 glm::mat4 toEuler(GLfloat yaw, GLfloat pitch, GLfloat roll){

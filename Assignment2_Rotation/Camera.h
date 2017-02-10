@@ -66,6 +66,7 @@ public:
     // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
+        this->updateCameraVectors();
         return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
     }
     
@@ -129,12 +130,6 @@ public:
     glm::vec3 GetFront( )
     {
         return this->Front;
-    }
-    
-    void changeView(glm::vec3 Pos){
-        this->Yaw = 90;
-        this->Position = Pos;
-        updateCameraVectors(); 
     }
     
 private:

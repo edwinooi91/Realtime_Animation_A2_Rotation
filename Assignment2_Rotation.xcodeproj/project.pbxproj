@@ -28,6 +28,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E834E3DA1E4B60F60088A5A7 /* skybox.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = skybox.vs; path = Build/Products/Debug/skybox.vs; sourceTree = "<group>"; };
+		E834E3DB1E4B611B0088A5A7 /* skybox.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = skybox.frag; path = Build/Products/Debug/skybox.frag; sourceTree = "<group>"; };
 		E875D8561E42279900FCBBA6 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		E875D8571E42279900FCBBA6 /* Mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
 		E875D8581E42279900FCBBA6 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
@@ -76,6 +78,8 @@
 			children = (
 				E87826231E40ADE4004567C7 /* Assignment2_Rotation */,
 				E87826221E40ADE4004567C7 /* Products */,
+				E834E3DB1E4B611B0088A5A7 /* skybox.frag */,
+				E834E3DA1E4B60F60088A5A7 /* skybox.vs */,
 				E875D8671E42288900FCBBA6 /* diffuse.frag */,
 				E875D8681E42288900FCBBA6 /* diffuse.vs */,
 				E875D85A1E4227A300FCBBA6 /* Frameworks */,
